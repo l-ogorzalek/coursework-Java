@@ -50,7 +50,6 @@ public class BookController {
         Book savedBook = bookService.save(newBook);
 
         BookResponse response = new BookResponse();
-        response.setId(savedBook.getId());
         response.setTitle(savedBook.getTitle());
         response.setAuthor(savedBook.getAuthor());
         response.setIsbn(savedBook.getIsbn());
@@ -84,7 +83,7 @@ public class BookController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Book> partialylUpdateBook(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<Book> partiallylUpdateBook(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
         Book book = bookService.findById(id);
         if (book == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -96,6 +95,9 @@ public class BookController {
                     break;
                 case "author":
                     book.setAuthor((String) value);
+                    break;
+                case "coAuthors":
+                    logger.info("Co-authors cannot be updated using PATCH method.");
                     break;
                 case "isbn":
                     book.setIsbn((String) value);

@@ -1,13 +1,16 @@
 package com.example.library.dto;
 
 import lombok.Data;
-import java.util.UUID;
+
+import java.util.List;
+
+import com.example.library.model.Author;
 
 @Data
 public class BookResponse {
-    private UUID id;
     private String title;
     private String author;
+    private List<Author> coAuthors;
     private String isbn;
     private int publicationYear;
     private String publisher;

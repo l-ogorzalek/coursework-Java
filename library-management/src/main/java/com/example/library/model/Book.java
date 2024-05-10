@@ -5,9 +5,12 @@ import lombok.Data;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,6 +28,10 @@ public class Book {
     @JoinColumn(name = "author_id")
     private String author;
 
+    @ManyToMany
+    @JoinTable(name = "book_coauthors", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
+    private List<Author> coAuthors;
+
     private String isbn;
     private int publicationYear;
     private String publisher;
@@ -32,9 +39,3 @@ public class Book {
     private String language;
     private String genre;
 }
-
-/*
-
- * TO DO: consider implementing 'co-authors' field in 'Book' entity, which could be (idk?) a list of 'Author' objects,
- * as sticking to "one author per book" rule often doesn't reflect reality.
- */
