@@ -9,7 +9,7 @@ import com.example.library.model.Author;
 @Data
 public class BookResponse {
     private String title;
-    private String author;
+    private Author author;
     private List<Author> coAuthors;
     private String isbn;
     private int publicationYear;

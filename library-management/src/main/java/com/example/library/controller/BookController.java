@@ -2,6 +2,7 @@ package com.example.library.controller;
 
 import com.example.library.dto.BookCreateRequest;
 import com.example.library.dto.BookResponse;
+import com.example.library.model.Author;
 import com.example.library.model.Book;
 import com.example.library.service.BookService;
 
@@ -94,7 +95,7 @@ public class BookController {
                     book.setTitle((String) value);
                     break;
                 case "author":
-                    book.setAuthor((String) value);
+                    book.setAuthor((Author) value);
                     break;
                 case "coAuthors":
                     logger.info("Co-authors cannot be updated using PATCH method.");

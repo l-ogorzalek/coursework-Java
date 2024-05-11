@@ -26,7 +26,7 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    private String author;
+    private Author author;
 
     @ManyToMany
     @JoinTable(name = "book_coauthors", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))

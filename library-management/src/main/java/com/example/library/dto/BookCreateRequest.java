@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class BookCreateRequest {
     private String title;
-    private String author;
+    private Author author;
     private List<Author> coAuthors;
     private String isbn;
     private int publicationYear;
