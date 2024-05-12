@@ -1,16 +1,14 @@
 package com.example.library.service;
 
-import com.example.library.model.Book;
+import com.example.library.dto.BookResponse;
 
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
+
 public interface BookService {
-    List<Book> findAll();
+    List<BookResponse> findAll();
 
-    Book findById(UUID id);
-
-    Book save(Book book);
-
-    void deleteById(UUID id);
+    ResponseEntity<BookResponse> findById(UUID id);
 }

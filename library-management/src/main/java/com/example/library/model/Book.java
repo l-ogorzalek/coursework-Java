@@ -1,6 +1,7 @@
 package com.example.library.model;
 
 import org.hibernate.annotations.UuidGenerator;
+
 import lombok.Data;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
