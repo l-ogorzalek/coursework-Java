@@ -2,6 +2,7 @@ package com.example.library.service;
 
 import com.example.library.dto.BookCreateRequest;
 import com.example.library.dto.BookResponse;
+import com.example.library.mapper.BookMapper;
 import com.example.library.model.Book;
 import com.example.library.repository.BookRepository;
 
@@ -25,66 +26,29 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+    private static final BookMapper bookMapper = BookMapper.INSTANCE;
     private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
     @Override
     public List<BookResponse> findAll() {
         return bookRepository.findAll().stream()
-                .map(book -> {
-                    BookResponse response = new BookResponse();
-                    response.setTitle(book.getTitle());
-                    response.setAuthor(book.getAuthor());
-                    response.setIsbn(book.getIsbn());
-                    response.setPublicationYear(book.getPublicationYear());
-                    response.setPublisher(book.getPublisher());
-                    response.setNumberOfPages(book.getNumberOfPages());
-                    return response;
-                })
+                .map(bookMapper::bookToBookResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ResponseEntity<BookResponse> findById(UUID id) {
         Optional<Book> book = bookRepository.findById(id);
-        if (book.isPresent()) {
-            BookResponse response = new BookResponse();
-            response.setTitle(book.get().getTitle());
-            response.setAuthor(book.get().getAuthor());
-            response.setIsbn(book.get().getIsbn());
-            response.setPublicationYear(book.get().getPublicationYear());
-            response.setPublisher(book.get().getPublisher());
-            response.setNumberOfPages(book.get().getNumberOfPages());
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return book.map(value -> ResponseEntity.ok(bookMapper.bookToBookResponse(value)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @Transactional
     public ResponseEntity<BookResponse> createBook(BookCreateRequest request) {
-        Book newBook = new Book();
-        newBook.setTitle(request.getTitle());
-        newBook.setAuthor(request.getAuthor());
-        newBook.setCoAuthors(request.getCoAuthors());
-        newBook.setIsbn(request.getIsbn());
-        newBook.setPublicationYear(request.getPublicationYear());
-        newBook.setPublisher(request.getPublisher());
-        newBook.setNumberOfPages(request.getNumberOfPages());
-        newBook.setLanguage(request.getLanguage());
-        newBook.setGenre(request.getGenre());
+        Book newBook = bookMapper.bookCreateRequestToBook(request);
         Book savedBook = bookRepository.save(newBook);
-
-        BookResponse response = new BookResponse();
-        response.setTitle(savedBook.getTitle());
-        response.setAuthor(savedBook.getAuthor());
-        response.setCoAuthors(savedBook.getCoAuthors());
-        response.setIsbn(savedBook.getIsbn());
-        response.setPublicationYear(savedBook.getPublicationYear());
-        response.setPublisher(savedBook.getPublisher());
-        response.setNumberOfPages(savedBook.getNumberOfPages());
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
+                .body(bookMapper.bookToBookResponse(savedBook));
     }
 
     @Transactional
@@ -93,27 +57,10 @@ public class BookServiceImpl implements BookService {
         if (existingBook == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        existingBook.setTitle(bookReplacement.getTitle());
-        existingBook.setAuthor(bookReplacement.getAuthor());
-        existingBook.setCoAuthors(bookReplacement.getCoAuthors());
-        existingBook.setIsbn(bookReplacement.getIsbn());
-        existingBook.setPublicationYear(bookReplacement.getPublicationYear());
-        existingBook.setPublisher(bookReplacement.getPublisher());
-        existingBook.setNumberOfPages(bookReplacement.getNumberOfPages());
-        existingBook.setLanguage(bookReplacement.getLanguage());
-        existingBook.setGenre(bookReplacement.getGenre());
-        Book savedBook = bookRepository.save(existingBook);
-
-        BookResponse response = new BookResponse();
-        response.setTitle(savedBook.getTitle());
-        response.setAuthor(savedBook.getAuthor());
-        response.setCoAuthors(savedBook.getCoAuthors());
-        response.setIsbn(savedBook.getIsbn());
-        response.setPublicationYear(savedBook.getPublicationYear());
-        response.setPublisher(savedBook.getPublisher());
-        response.setNumberOfPages(savedBook.getNumberOfPages());
-
-        return ResponseEntity.ok(response);
+        Book updatedBook = bookMapper.bookCreateRequestToBook(bookReplacement);
+        updatedBook.setId(existingBook.getId());
+        Book savedBook = bookRepository.save(updatedBook);
+        return ResponseEntity.ok(bookMapper.bookToBookResponse(savedBook));
     }
 
     public ResponseEntity<Object> deleteBook(UUID id) {
@@ -135,12 +82,6 @@ public class BookServiceImpl implements BookService {
                             case "title":
                                 book.setTitle((String) value);
                                 break;
-                            case "author":
-                                logger.info("Author cannot be updated using PATCH method.");
-                                break;
-                            case "coAuthors":
-                                logger.info("Co-authors cannot be updated using PATCH method.");
-                                break;
                             case "isbn":
                                 book.setIsbn((String) value);
                                 break;
@@ -153,31 +94,13 @@ public class BookServiceImpl implements BookService {
                             case "numberOfPages":
                                 book.setNumberOfPages((Integer) value);
                                 break;
-                            case "language":
-                                logger.info("Language cannot be updated using PATCH method.");
-                                break;
-                            case "genre":
-                                logger.info("Genre cannot be updated using PATCH method.");
-                                break;
                             default:
                                 logger.warn("Unknown key '{}' has been ignored.", key);
                         }
                     });
                     Book savedBook = bookRepository.save(book);
-                    return ResponseEntity.ok(convertToBookResponse(savedBook));
+                    return ResponseEntity.ok(bookMapper.bookToBookResponse(savedBook));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    private BookResponse convertToBookResponse(Book book) {
-        BookResponse response = new BookResponse();
-        response.setTitle(book.getTitle());
-        response.setAuthor(book.getAuthor());
-        response.setCoAuthors(book.getCoAuthors());
-        response.setIsbn(book.getIsbn());
-        response.setPublicationYear(book.getPublicationYear());
-        response.setPublisher(book.getPublisher());
-        response.setNumberOfPages(book.getNumberOfPages());
-        return response;
     }
 }

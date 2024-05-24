@@ -1,13 +1,13 @@
 package com.example.library.service;
 
-import com.example.library.model.Author;
+import com.example.library.dto.AuthorDto;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 
 public interface AuthorService {
-    List<Author> findAll();
+    List<AuthorDto> findAll();
 
-    ResponseEntity<Author> findById(UUID id);
+    ResponseEntity<AuthorDto> findById(UUID id);
 }

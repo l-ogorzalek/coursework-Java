@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.dto.AuthorCreateRequest;
+import com.example.library.dto.AuthorDto;
 import com.example.library.dto.AuthorAfterCreationResponse;
 import com.example.library.model.Author;
 import com.example.library.service.AuthorServiceImpl;
@@ -21,22 +22,22 @@ public class AuthorController {
     private final AuthorServiceImpl authorServiceImpl;
 
     @GetMapping
-    public List<Author> getAllAuthors() {
+    public List<AuthorDto> getAllAuthors() {
         return authorServiceImpl.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Author> findById(@PathVariable UUID id) {
+    public ResponseEntity<AuthorDto> findById(@PathVariable UUID id) {
         return authorServiceImpl.findById(id);
     }
 
     @PostMapping
     public ResponseEntity<AuthorAfterCreationResponse> createAuthor(@RequestBody AuthorCreateRequest request) {
-        return authorServiceImpl.createAuthor(request);
+        return authorServiceImpl.createAuthor();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Author> updateAuthor(@PathVariable UUID id, @RequestBody Author author) {
+    public ResponseEntity<AuthorDto> updateAuthor(@PathVariable UUID id, @RequestBody Author author) {
         return authorServiceImpl.updateAuthor(id, author);
     }
 
@@ -46,7 +47,7 @@ public class AuthorController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Author> partiallyUpdateAuthor(@PathVariable UUID id,
+    public ResponseEntity<AuthorDto> partiallyUpdateAuthor(@PathVariable UUID id,
             @RequestBody Map<String, Object> updates) {
         return authorServiceImpl.partiallyUpdateAuthor(id, updates);
     }
